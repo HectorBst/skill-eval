@@ -1,0 +1,60 @@
+# Install once with: uv run pre-commit install --install-hooks -t pre-commit -t pre-push
+# Hooks that need the project environment (mypy, complexipy, pytest) run through uv,
+# so they check the same versions as CI.
+default_install_hook_types: [pre-commit, pre-push]
+default_stages: [pre-commit]
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: trailing-whitespace
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/astral-sh/uv-pre-commit
+    rev: 0.13.7
+    hooks:
+      - id: uv-lock
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.17.3
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy (strict)
+        entry: uv run --frozen mypy
+        language: system
+        types: [python]
+        pass_filenames: false
+      - id: complexipy
+        name: cognitive complexity (max 15)
+        entry: uv run --frozen complexipy src --max-complexity-allowed 15
+        language: system
+        types: [python]
+        pass_filenames: false
+      - id: pytest
+        name: pytest with coverage gate
+        entry: uv run --frozen pytest -q
+        language: system
+        types: [python]
+        pass_filenames: false
+        stages: [pre-push]

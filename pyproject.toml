@@ -1,0 +1,169 @@
+[project]
+name = "skill-eval"
+version = "0.1.0"
+description = "Evaluates agent skills (SKILL.md) before sharing them: invocation and quality, repeated trials, three-state verdicts."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Hector Basset" }]
+classifiers = [
+    "Development Status :: 2 - Pre-Alpha",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Typing :: Typed",
+]
+dependencies = [
+    "pydantic>=2.14,<3",
+    "pyyaml>=6.0.3,<7",
+    "scipy>=1.18,<2",
+]
+
+[project.scripts]
+skill-eval = "skill_eval.cli:main"
+
+[dependency-groups]
+dev = [
+    "complexipy>=8.3",
+    "diff-cover>=11.0",
+    "hypothesis>=6.170",
+    "mypy>=2.4",
+    "pip-audit>=2.10",
+    "pre-commit>=4.7",
+    "pytest>=9.2",
+    "pytest-cov>=7.1",
+    "ruff>=0.17.3",
+    "scipy-stubs>=1.18.1.1",
+    "types-pyyaml>=6.0.12.20261103",
+]
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/skill_eval"]
+
+[tool.uv]
+default-groups = ["dev"]
+
+# --- Lint and format -------------------------------------------------------
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "A",    # builtins shadowing
+    "ARG",  # unused arguments
+    "B",    # bugbear
+    "BLE",  # blind except
+    "C4",   # comprehensions
+    "C90",  # cyclomatic complexity (cognitive complexity is checked by complexipy)
+    "D",    # docstrings
+    "DTZ",  # naive datetimes
+    "E",
+    "ERA",  # commented-out code
+    "F",
+    "FBT",  # boolean traps
+    "I",    # import order
+    "ISC",
+    "N",    # naming
+    "PERF",
+    "PIE",
+    "PL",   # pylint
+    "PT",   # pytest style
+    "PTH",  # pathlib
+    "RET",
+    "RSE",
+    "RUF",
+    "S",    # bandit security rules
+    "SIM",
+    "SLF",
+    "T20",  # print
+    "TC",   # type-checking imports
+    "TRY",
+    "UP",
+    "W",
+]
+ignore = [
+    "D203",   # conflicts with D211
+    "D213",   # conflicts with D212
+    "TRY003", # messages carry the offending values, which is what a reader needs
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = [
+    "S101",    # assert is the pytest idiom
+    "D",       # test names document themselves
+    "PLR2004", # magic values are the expected figures
+    "PLR0913",
+    "SLF001",
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.pylint]
+max-args = 6
+
+[tool.ruff.format]
+docstring-code-format = true
+
+# --- Types -------------------------------------------------------------------
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unreachable = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+files = ["src", "tests"]
+plugins = ["pydantic.mypy"]
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+
+# --- Tests and coverage -------------------------------------------------------
+
+[tool.pytest.ini_options]
+minversion = "9.0"
+testpaths = ["tests"]
+addopts = [
+    "--strict-markers",
+    "--strict-config",
+    "-ra",
+    "--cov=skill_eval",
+    "--cov-branch",
+    "--cov-report=term-missing:skip-covered",
+    "--cov-report=xml",
+    "--cov-fail-under=85",
+]
+xfail_strict = true
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+branch = true
+source = ["skill_eval"]
+
+[tool.coverage.report]
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "@overload",
+    "\\.\\.\\.",
+]
+show_missing = true
+
+# --- Cognitive complexity -------------------------------------------------------
+
+[tool.complexipy]
+paths = ["src"]
+max-complexity-allowed = 15
