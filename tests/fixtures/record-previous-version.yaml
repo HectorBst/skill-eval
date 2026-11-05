@@ -1,0 +1,184 @@
+# Counts of the previous version e81b4d0, compared case by case in the example.
+skill: mon-skill
+skill_version: "e81b4d0"
+date: 2026-10-29
+environment:
+  installed_skills: 34
+  installed_skills_hash: "9c04e2b"
+  inspect_ai: "0.3.287"
+  inspect_swe: "0.2.67"
+
+invocation:
+  # Runs where the skill started, per case. Cases are kept aside or used for tuning
+  # from their name alone (holdout_share in skill-eval.yaml).
+  positive:
+    pos-03: {runs: 10, started: 10}
+    pos-05: {runs: 10, started: 10}
+    pos-10: {runs: 10, started: 10}
+    pos-11: {runs: 10, started: 10}
+    pos-12: {runs: 10, started: 10}
+    pos-13: {runs: 10, started: 10}
+    pos-15: {runs: 10, started: 10}
+    pos-17: {runs: 10, started: 10}
+    pos-20: {runs: 10, started: 9}
+    pos-24: {runs: 10, started: 9}
+    pos-25: {runs: 10, started: 9}
+    pos-27: {runs: 10, started: 9}
+    pos-28: {runs: 10, started: 8}
+    pos-33: {runs: 10, started: 8}
+    pos-34: {runs: 10, started: 10}
+    pos-38: {runs: 10, started: 8}
+    pos-39: {runs: 10, started: 7}
+    pos-41: {runs: 10, started: 5}
+    pos-implicit-07: {runs: 10, started: 5}
+    pos-english-12: {runs: 10, started: 2}
+    pos-01: {runs: 10, started: 10}
+    pos-02: {runs: 10, started: 10}
+    pos-04: {runs: 10, started: 10}
+    pos-06: {runs: 10, started: 10}
+    pos-07: {runs: 10, started: 10}
+    pos-08: {runs: 10, started: 10}
+    pos-09: {runs: 10, started: 10}
+    pos-14: {runs: 10, started: 10}
+    pos-16: {runs: 10, started: 10}
+    pos-18: {runs: 10, started: 10}
+    pos-19: {runs: 10, started: 10}
+    pos-21: {runs: 10, started: 10}
+    pos-22: {runs: 10, started: 10}
+    pos-23: {runs: 10, started: 10}
+    pos-26: {runs: 10, started: 10}
+    pos-29: {runs: 10, started: 10}
+    pos-30: {runs: 10, started: 10}
+    pos-31: {runs: 10, started: 10}
+    pos-32: {runs: 10, started: 10}
+    pos-35: {runs: 10, started: 10}
+    pos-36: {runs: 10, started: 10}
+    pos-37: {runs: 10, started: 10}
+    pos-40: {runs: 10, started: 10}
+    pos-43: {runs: 10, started: 10}
+    pos-47: {runs: 10, started: 9}
+    pos-48: {runs: 10, started: 9}
+    pos-49: {runs: 10, started: 9}
+    pos-50: {runs: 10, started: 9}
+    pos-51: {runs: 10, started: 4}
+    pos-52: {runs: 10, started: 4}
+  negative:
+    neg-01: {runs: 10, started: 0}
+    neg-03: {runs: 10, started: 0}
+    neg-04: {runs: 10, started: 0}
+    neg-10: {runs: 10, started: 0}
+    neg-11: {runs: 10, started: 0}
+    neg-13: {runs: 10, started: 0}
+    neg-15: {runs: 10, started: 0}
+    neg-16: {runs: 10, started: 0}
+    neg-18: {runs: 10, started: 0}
+    neg-21: {runs: 10, started: 0}
+    neg-22: {runs: 10, started: 0}
+    neg-23: {runs: 10, started: 0}
+    neg-25: {runs: 10, started: 0}
+    neg-26: {runs: 10, started: 0}
+    neg-27: {runs: 10, started: 0}
+    neg-34: {runs: 10, started: 0}
+    neg-35: {runs: 10, started: 0}
+    neg-pdf-03: {runs: 10, started: 2}
+    neg-email-04: {runs: 10, started: 2}
+    neg-slack-15: {runs: 10, started: 2}
+    neg-02: {runs: 10, started: 0}
+    neg-05: {runs: 10, started: 0}
+    neg-06: {runs: 10, started: 0}
+    neg-07: {runs: 10, started: 0}
+    neg-08: {runs: 10, started: 0}
+    neg-09: {runs: 10, started: 0}
+    neg-12: {runs: 10, started: 0}
+    neg-14: {runs: 10, started: 0}
+    neg-17: {runs: 10, started: 0}
+    neg-19: {runs: 10, started: 0}
+    neg-20: {runs: 10, started: 0}
+    neg-24: {runs: 10, started: 0}
+    neg-28: {runs: 10, started: 0}
+    neg-29: {runs: 10, started: 0}
+    neg-30: {runs: 10, started: 0}
+    neg-31: {runs: 10, started: 0}
+    neg-32: {runs: 10, started: 0}
+    neg-33: {runs: 10, started: 0}
+    neg-36: {runs: 10, started: 0}
+    neg-37: {runs: 10, started: 0}
+    neg-38: {runs: 10, started: 0}
+    neg-41: {runs: 10, started: 0}
+    neg-42: {runs: 10, started: 0}
+    neg-44: {runs: 10, started: 0}
+    neg-52: {runs: 10, started: 0}
+    neg-53: {runs: 10, started: 1}
+    neg-56: {runs: 10, started: 1}
+    neg-58: {runs: 10, started: 1}
+    neg-59: {runs: 10, started: 2}
+    neg-60: {runs: 10, started: 2}
+
+quality:
+  # Runs where every check passed, per case.
+  with_skill:
+    q-01: {runs: 10, succeeded: 10}
+    q-02: {runs: 10, succeeded: 10}
+    q-07: {runs: 10, succeeded: 10}
+    q-11: {runs: 10, succeeded: 10}
+    q-12: {runs: 10, succeeded: 10}
+    q-15: {runs: 10, succeeded: 10}
+    q-17: {runs: 10, succeeded: 9}
+    q-18: {runs: 10, succeeded: 9}
+    q-20: {runs: 10, succeeded: 8}
+    q-21: {runs: 10, succeeded: 8}
+    q-27: {runs: 10, succeeded: 7}
+    q-29: {runs: 10, succeeded: 7}
+    q-long-doc-04: {runs: 10, succeeded: 6}
+    q-multi-source-11: {runs: 10, succeeded: 4}
+    q-incomplete-input-01: {runs: 10, succeeded: 1}
+    q-03: {runs: 10, succeeded: 10}
+    q-04: {runs: 10, succeeded: 10}
+    q-05: {runs: 10, succeeded: 10}
+    q-06: {runs: 10, succeeded: 10}
+    q-08: {runs: 10, succeeded: 10}
+    q-09: {runs: 10, succeeded: 10}
+    q-10: {runs: 10, succeeded: 10}
+    q-13: {runs: 10, succeeded: 10}
+    q-14: {runs: 10, succeeded: 10}
+    q-16: {runs: 10, succeeded: 10}
+    q-19: {runs: 10, succeeded: 10}
+    q-22: {runs: 10, succeeded: 10}
+    q-23: {runs: 10, succeeded: 10}
+    q-24: {runs: 10, succeeded: 10}
+    q-25: {runs: 10, succeeded: 10}
+    q-26: {runs: 10, succeeded: 10}
+    q-28: {runs: 10, succeeded: 10}
+    q-30: {runs: 10, succeeded: 6}
+    q-33: {runs: 10, succeeded: 6}
+    q-35: {runs: 10, succeeded: 6}
+    q-37: {runs: 10, succeeded: 6}
+    q-38: {runs: 10, succeeded: 6}
+    q-41: {runs: 10, succeeded: 6}
+
+# Answers graded by both the judge and a person (judge_calibration).
+judge_calibration:
+  - {judge_passed: true, person_passed: true}
+  - {judge_passed: true, person_passed: true}
+  - {judge_passed: true, person_passed: true}
+  - {judge_passed: true, person_passed: true}
+  - {judge_passed: true, person_passed: true}
+  - {judge_passed: true, person_passed: true}
+  - {judge_passed: true, person_passed: true}
+  - {judge_passed: true, person_passed: true}
+  - {judge_passed: true, person_passed: true}
+  - {judge_passed: true, person_passed: true}
+  - {judge_passed: true, person_passed: true}
+  - {judge_passed: true, person_passed: true}
+  - {judge_passed: true, person_passed: true}
+  - {judge_passed: true, person_passed: true}
+  - {judge_passed: true, person_passed: true}
+  - {judge_passed: true, person_passed: true}
+  - {judge_passed: true, person_passed: true}
+  - {judge_passed: false, person_passed: false}
+  - {judge_passed: false, person_passed: false}
+  - {judge_passed: false, person_passed: false}
+  - {judge_passed: false, person_passed: false}
+  - {judge_passed: false, person_passed: false}
+  - {judge_passed: true, person_passed: false}
+  - {judge_passed: false, person_passed: true}
