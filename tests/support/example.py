@@ -10,8 +10,23 @@ one solution among several and only need to reproduce the published figures.
 Invocation counts are given as the number of runs where the skill started.
 """
 
+from pathlib import PurePath
+
 from skill_eval.domain.agreement import LabelledAnswer
+from skill_eval.domain.config import (
+    Agent,
+    Effort,
+    EvaluationConfig,
+    Execution,
+    GateName,
+    Gates,
+    InvocationSettings,
+    QualitySettings,
+    Trials,
+)
 from skill_eval.domain.estimators import CaseCount
+from skill_eval.domain.evaluation import Observations, PreviousRun
+from skill_eval.domain.split import Split
 
 RUNS = 10
 
@@ -105,3 +120,66 @@ JUDGE_ANSWERS = (
     + [LabelledAnswer(judge_passed=True, person_passed=False)]
     + [LabelledAnswer(judge_passed=False, person_passed=True)]
 )
+
+
+# --- Whole example, as domain inputs -------------------------------------------------
+
+
+def config() -> EvaluationConfig:
+    """Settings of docs/skill-eval.example.yaml."""
+    return EvaluationConfig(
+        execution=Execution(
+            agent=Agent.CLAUDE_CODE,
+            agent_version="2.1.309",
+            model="claude-sonnet-5-5",
+            judge_model="claude-haiku-5-5",
+            effort=Effort.MEDIUM,
+            installed_skills=PurePath("skills"),
+        ),
+        trials=Trials(invocation_per_case=10, quality_per_case=10, k_pass_at=3, k_pass_hat=5),
+        confidence_level=0.95,
+        holdout_share=0.4,
+        minimum_cases=15,
+        invocation=InvocationSettings(
+            max_turns=3,
+            positive_cases=PurePath("evals/invocation/positive"),
+            negative_cases=PurePath("evals/invocation/negative"),
+        ),
+        quality=QualitySettings(
+            cases=PurePath("evals/quality"),
+            measure_lift=True,
+            judge_calibration=PurePath("evals/quality/judge-calibration"),
+            judge_minimum_agreement=0.60,
+        ),
+        gates=Gates.from_values(
+            {
+                GateName.INVOCATION_RECALL: 0.85,
+                GateName.INVOCATION_FALSE_TRIGGER_RATE: 0.10,
+                GateName.INVOCATION_PASS_HAT_K: 0.50,
+                GateName.QUALITY_PASS_AT_1: 0.75,
+                GateName.QUALITY_PASS_HAT_K: 0.60,
+            }
+        ),
+    )
+
+
+def observations() -> Observations:
+    """Counts of the example, split as the example result reports them."""
+    return Observations(
+        positive=Split(tuple(POSITIVE_HOLDOUT), tuple(POSITIVE_TUNING)),
+        negative=Split(tuple(NEGATIVE_HOLDOUT), tuple(NEGATIVE_TUNING)),
+        quality=Split(tuple(QUALITY_HOLDOUT), tuple(QUALITY_TUNING)),
+        quality_without_skill=tuple(
+            CaseCount(name, RUNS, value) for name, value in QUALITY_WITHOUT_SKILL.items()
+        ),
+        judge_answers=tuple(JUDGE_ANSWERS),
+    )
+
+
+def previous_run() -> PreviousRun:
+    """Counts of version e81b4d0 on the same cases kept aside."""
+    return PreviousRun(
+        version="e81b4d0",
+        positive=tuple(_started(name, value) for name, value in POSITIVE_PREVIOUS_STARTED.items()),
+        quality=tuple(CaseCount(name, RUNS, value) for name, value in QUALITY_PREVIOUS.items()),
+    )
