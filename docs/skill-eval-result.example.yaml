@@ -1,0 +1,114 @@
+# skill-eval-result.yaml
+# Result of one evaluation run. Read "summary" first; details follow.
+# Example with fictitious but consistent figures, computed from per-case success counts.
+
+summary:
+  releasable: false
+  # No score is on the wrong side of its limit, but three ranges are too wide to conclude.
+  reason: 3 gates inconclusive
+  next_step: Fix the cases listed under diagnostics, then add test cases kept aside and run again.
+
+run:
+  skill: mon-skill
+  skill_version: 3f2a9c1         # Hash of SKILL.md: compare results only within one version
+  date: 2026-11-05
+  settings:                      # Copied from skill-eval.yaml
+    agent: claude_code
+    agent_version: "2.1.309"
+    model: claude-sonnet-5-5
+    judge_model: claude-haiku-5-5
+    effort: medium
+    trials: {invocation_per_case: 10, quality_per_case: 10, k_pass_at: 3, k_pass_hat: 5}
+    confidence_level: 0.95
+    holdout_share: 0.4
+    minimum_cases: 15
+  environment:                   # Recorded so that two results can be compared fairly
+    installed_skills: 34
+    installed_skills_hash: 9c04e2b
+    inspect_ai: 0.3.287
+    inspect_swe: 0.2.67
+  runner:                        # Fixed by the runner, recorded for traceability
+    interval_method: student_t_by_case   # Wilson interval when every case has the same value
+    invocation_max_turns: 3
+    quality_run_success: all_checks
+    split: by_case_name
+
+# Each score gives a value, then a range [low, high]: the true score lies in that range
+# 95 times out of 100. A wide range means too few test cases to be sure.
+# All blocking scores below are computed on the cases kept aside.
+
+invocation:
+  cases_kept_aside: {positive: 20, negative: 20}
+  runs: {positive: 200, negative: 200}
+  counts:
+    started_when_expected: 180   # Positive runs where the skill started
+    missed: 20                   # Positive runs where it did not start
+    started_by_mistake: 6        # Negative runs where it started anyway
+
+  # Starts when it should: share of positive runs where the skill started.
+  recall: {value: 0.900, range: [0.81, 0.99]}
+  # Starts by mistake on similar requests: share of negative runs where the skill started.
+  false_trigger_rate: {value: 0.030, range: [0.00, 0.06]}
+  # Share of starts that were justified. Reported only: it depends on the share of positive
+  # cases in the test set (half here), and real usage has fewer, so real precision is lower.
+  precision: 0.968
+  # Starts every time it should, 5 uses in a row (positive cases; the gate applies here).
+  pass_hat_k: {value: 0.745, range: [0.56, 0.93]}
+  # Never starts by mistake, 5 uses in a row (negative cases). Reported only.
+  pass_hat_k_negative: {value: 0.883, range: [0.75, 1.00]}
+  # Cases used to improve the skill. Reported only: the skill was tuned on them.
+  tuning: {cases: {positive: 30, negative: 30}, recall: 0.947, false_trigger_rate: 0.023}
+
+quality:
+  cases_kept_aside: 15
+  runs: 150
+  successful_runs: 122           # Runs where every check passed
+
+  # Does the job well on a single use: what to expect from one use.
+  pass_at_1: {value: 0.813, range: [0.65, 0.98]}
+  # Does the job well at least once in 3 tries. No limit: used for diagnosis.
+  # Well above pass_at_1: the skill can do most tasks, but not every time.
+  pass_at_k: {value: 0.917, range: [0.77, 1.00]}
+  # Does the job well every time, 5 uses in a row: what a user relying on the skill gets.
+  pass_hat_k: {value: 0.611, range: [0.36, 0.86]}
+  # The same score for 1 to 10 uses in a row. A slow decline means failures sit on a few cases,
+  # which can be fixed one by one. Here 0.611 at 5 uses, against 0.356 if failures were spread
+  # evenly over all cases: failures are concentrated.
+  pass_hat_k_by_uses: [0.813, 0.735, 0.681, 0.642, 0.611, 0.587, 0.567, 0.551, 0.540, 0.533]
+  # What the skill adds: the same cases run without the skill. Reported only.
+  without_skill: {pass_at_1: 0.527, range: [0.40, 0.66], successful_runs: 79}
+  lift: {value: +0.287, range: [+0.19, +0.38]}   # Case by case difference, with minus without
+  # Agreement between the judge and a person on 24 graded answers.
+  judge_agreement: {kappa: 0.78, labelled_answers: 24, trusted: true}
+  tuning: {cases: 23, pass_at_1: 0.896}
+
+compared_with_previous_version:
+  # Same cases kept aside, compared case by case with the last result of version e81b4d0.
+  previous_version: e81b4d0
+  invocation_recall: {change: +0.055, range: [+0.01, +0.10], verdict: improved}
+  quality_pass_at_1: {change: +0.020, range: [-0.02, +0.06], verdict: no_clear_change}
+
+gates:
+  # passed: whole range on the right side of the limit
+  # failed: whole range on the wrong side of the limit
+  # inconclusive: range straddles the limit; add test cases and run again
+  invocation_recall:             {minimum: 0.85, value: 0.900, range: [0.81, 0.99], verdict: inconclusive}
+  invocation_false_trigger_rate: {maximum: 0.10, value: 0.030, range: [0.00, 0.06], verdict: passed}
+  invocation_pass_hat_k:         {minimum: 0.50, value: 0.745, range: [0.56, 0.93], verdict: passed}
+  quality_pass_at_1:             {minimum: 0.75, value: 0.813, range: [0.65, 0.98], verdict: inconclusive}
+  quality_pass_hat_k:            {minimum: 0.60, value: 0.611, range: [0.36, 0.86], verdict: inconclusive}
+
+diagnostics:
+  # Cases kept aside to look at first, with successes out of runs.
+  invocation_unstable:           # Starts only part of the time: the description misses these phrasings
+    pos-implicit-07: "5/10"
+    pos-english-12: "3/10"
+  invocation_started_by_mistake: # Starts when it should not: the description is too broad
+    neg-pdf-03: "2/10"
+    neg-email-08: "2/10"
+    neg-slack-15: "2/10"
+  quality_never_succeeds:        # Fails every time: missing capability or unclear instructions
+    q-incomplete-input-04: "0/10"
+  quality_unstable:              # Succeeds only part of the time: ambiguous steps, consider a script
+    q-long-doc-09: "5/10"
+    q-multi-source-11: "4/10"

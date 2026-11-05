@@ -1,0 +1,74 @@
+# skill-eval.yaml
+# Checks a skill before sharing it. Two questions are tested separately:
+#   - invocation: does the skill start when it should, and only then?
+#   - quality: once started, does it do the job well?
+# The runner splits each set of test cases: one part to improve the skill, one part kept aside.
+# Only the cases kept aside decide whether the skill can be shared, so that rewriting
+# the skill until it passes its own tests does not inflate the verdict.
+# Rules checked before running:
+#   each per_case value must be at least k_pass_hat
+#   quality_per_case must also be at least k_pass_at
+#   k_pass_at and k_pass_hat must be at least 2
+
+execution:
+  agent: claude_code             # Agent that runs the skill: claude_code, codex_cli or gemini_cli
+  agent_version: "2.1.309"       # Fixed on purpose: triggering behaviour changes between agent versions
+  model: claude-sonnet-5-5       # Model being tested; keep it fixed to compare two versions of the skill
+  judge_model: claude-haiku-5-5  # Model that grades answers when a rule cannot be checked automatically
+  effort: medium                 # Reasoning effort of the tested model
+  installed_skills: skills/      # Every skill installed in real use, not only the tested one:
+                                 # with many skills installed, the agent starts each one less often
+
+trials:
+  # How many times each test case is run, each time in a new conversation.
+  # The same request gives different results from one run to the next,
+  # so one run proves nothing. More runs give more reliable scores, and cost more.
+  invocation_per_case: 10        # Cheap: only checks whether the skill starts
+  quality_per_case: 10           # Expensive: the whole task is done and graded.
+                                 # Keep it at least twice k_pass_hat for usable scores
+  # pass@k: "succeeds at least once in k tries". Use the number of retries a user would accept.
+  k_pass_at: 3
+  # pass^k: "succeeds every time, k uses in a row". Use the number of uses the skill must hold over.
+  k_pass_hat: 5
+
+# Each score comes as a range, because a few test cases cannot give an exact figure.
+# 0.95 means the true score lies in that range 95 times out of 100. Higher means a wider range.
+confidence_level: 0.95
+holdout_share: 0.4               # Share of cases kept aside to decide; the split is fixed per case name
+minimum_cases: 15                # Below this many cases kept aside, a verdict is always "inconclusive"
+
+invocation:
+  max_turns: 3                   # Conversation turns per run; enough to see whether the skill starts
+  cases:
+    positive: evals/invocation/positive/  # Requests the skill must handle, phrased as users would
+    negative: evals/invocation/negative/  # Similar requests where the skill must not start
+    # Write negative cases close to the skill's topic: unrelated requests always pass and test nothing.
+
+quality:
+  # The skill is always started on purpose here, so quality scores never include
+  # invocation failures (those are measured under invocation).
+  # A run succeeds only when all its checks pass.
+  cases: evals/quality/
+  measure_lift: true             # Also runs each case without the skill, to show what the skill adds.
+                                 # Reported only, never blocking; doubles the cost of quality runs
+  # Answers graded by a person, used to check that the judge agrees with people.
+  # Required when a check relies on the judge.
+  judge_calibration: evals/quality/judge-calibration/
+  judge_minimum_agreement: 0.60  # Agreement beyond chance between judge and person (Cohen's kappa);
+                                 # below it, results that rely on the judge are marked unreliable
+
+gates:
+  # Scores required to share the skill (example values, adjust per skill).
+  # Raise the recall minimum or lower the false trigger maximum depending on which mistake costs more:
+  #   reference skills (style guide, brand): missing a request is worse, raise recall
+  #   skills that act (send, deploy, delete): starting by mistake is worse, lower the false trigger rate
+  # Verdict for each score:
+  #   passed: the whole range is on the right side of the limit
+  #   failed: the whole range is on the wrong side of the limit
+  #   inconclusive: the range straddles the limit; add test cases and run again
+  # The skill can be shared only when every gate has passed.
+  invocation_recall: 0.85                # Minimum: starts when it should
+  invocation_false_trigger_rate: 0.10    # Maximum: starts by mistake on similar requests
+  invocation_pass_hat_k: 0.50            # Minimum: starts every time it should, k_pass_hat uses in a row
+  quality_pass_at_1: 0.75                # Minimum: does the job well on a single use
+  quality_pass_hat_k: 0.60               # Minimum: does the job well every time, k_pass_hat uses in a row
