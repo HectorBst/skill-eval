@@ -258,21 +258,36 @@ class EvaluationConfig:
 
     def __post_init__(self) -> None:
         """Check the settings shared by both parts."""
+        _raise_if_any(
+            self.shared_problems(
+                confidence_level=self.confidence_level,
+                holdout_share=self.holdout_share,
+                minimum_cases=self.minimum_cases,
+            )
+        )
+
+    @staticmethod
+    def shared_problems(
+        *, confidence_level: float, holdout_share: float, minimum_cases: int
+    ) -> list[str]:
+        """List the broken rules among the settings shared by both parts.
+
+        Exposed so that a reader can report these problems together with those of the
+        sections, before the whole configuration can be built.
+        """
         problems = []
-        if not 0.0 < self.confidence_level < 1.0:
+        if not 0.0 < confidence_level < 1.0:
             problems.append(
-                f"confidence_level must be strictly between 0 and 1, got {self.confidence_level}."
+                f"confidence_level must be strictly between 0 and 1, got {confidence_level}."
             )
-        if not 0.0 < self.holdout_share < 1.0:
-            problems.append(
-                f"holdout_share must be strictly between 0 and 1, got {self.holdout_share}."
-            )
-        if self.minimum_cases < _MIN_K:
+        if not 0.0 < holdout_share < 1.0:
+            problems.append(f"holdout_share must be strictly between 0 and 1, got {holdout_share}.")
+        if minimum_cases < _MIN_K:
             problems.append(
                 f"minimum_cases must be at least {_MIN_K} for a range to exist, "
-                f"got {self.minimum_cases}."
+                f"got {minimum_cases}."
             )
-        _raise_if_any(problems)
+        return problems
 
     def warnings(self) -> list[str]:
         """List settings that are valid but weaken the evaluation."""
